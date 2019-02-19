@@ -10,8 +10,8 @@ BASE_URL = "https://testnet.bitmex.com/api/v1/"
 # BASE_URL = "https://www.bitmex.com/api/v1/" # Once you're ready, uncomment this.
 
 # The BitMEX API requires permanent API keys. Go to https://testnet.bitmex.com/app/apiKeys to fill these out.
-API_KEY = "HyO3ekaIWOyAcTDhGiToji3d"
-API_SECRET = "gFrfDEPF_wLdvR1pDh92rVfB_X_811vDYbVG-9Q1ZWdPejGL"
+API_KEY = "EDwDQjVbWdHgNa5V-duD1eKD"
+API_SECRET = "T5t1bugZFKUHJLXQB3JlhHy3pD7GxfzaqanWREv4LYF6Ld_r"
 
 
 ########################################################################################################################
@@ -79,8 +79,8 @@ POST_ONLY = False
 ########################################################################################################################
 
 # If true, don't set up any orders, just say what we would do
-# DRY_RUN = True
-DRY_RUN = False
+DRY_RUN = True
+# DRY_RUN = False
 
 # How often to re-check and replace orders.
 # Generally, it's safe to make this short because we're fetching from websockets. But if too many

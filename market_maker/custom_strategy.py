@@ -14,7 +14,7 @@ class CustomOrderManager(OrderManager):
 
         # populate buy and sell orders, e.g.
         # buy_orders.append({'price': 999.0, 'orderQty': 100, 'side': "Buy"})
-        # sell_orders.append({'price': 1001.0, 'orderQty': 100, 'side': "Sell"})
+        sell_orders.append({'price': 3900.0, 'orderQty': 100, 'side': "Sell"})
 
         self.converge_orders(buy_orders, sell_orders)
 

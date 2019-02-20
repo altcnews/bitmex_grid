@@ -1,0 +1,1 @@
+bitmex-market-maker==1.5

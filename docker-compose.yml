@@ -3,8 +3,9 @@ version: '2'
 services:
 
   web:
-    image: python:3.6-stretch
-#    command: ["gunicorn", "app.main:create_app", "-b", "0.0.0.0:80", "--worker-class", "aiohttp.worker.GunicornWebWorker", "--reload"]
+#    image: python:3.6-stretch
+    build: .
+    command: ["python", "custom_run.py"]
 
     volumes:
       - .:/usr/src/app

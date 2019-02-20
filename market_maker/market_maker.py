@@ -4,7 +4,7 @@ import sys
 from datetime import datetime
 from os.path import getmtime
 import random
-# import requests
+import requests
 import atexit
 import signal
 
@@ -538,11 +538,9 @@ def margin(instrument, quantity, price):
 
 
 def run():
-    logger.info('1BitMEX Market Maker Version: %s\n' % constants.VERSION)
+    logger.info('BitMEX Market Maker Version: %s\n' % constants.VERSION)
 
     om = OrderManager()
-    # from market_maker.custom_strategy import CustomOrderManager
-    # om = CustomOrderManager()
     # Try/except just keeps ctrl-c from printing an ugly stacktrace
     try:
         om.run_loop()

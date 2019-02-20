@@ -205,7 +205,7 @@ class BitMEXWebsocket():
         '''Send a raw command.'''
         self.ws.send(json.dumps({"op": command, "args": args or []}))
 
-    def __on_message(self, message):
+    def __on_message(self, ws, message):
         '''Handler for parsing WS messages.'''
         message = json.loads(message)
         self.logger.debug(json.dumps(message))

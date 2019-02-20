@@ -19,8 +19,6 @@ def run():
         # import market_maker here rather than at the top because it depends on settings.py existing
         try:
             from market_maker import market_maker
-            print('123')
-            # from market_maker import custom_strategy
             market_maker.run()
         except ImportError:
             print('Can\'t find settings.py. Run "marketmaker setup" to create project.')

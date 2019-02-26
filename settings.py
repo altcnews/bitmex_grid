@@ -1,5 +1,21 @@
 from os.path import join
 import logging
+from market_maker.states import *
+
+
+########################################################################################################################
+# Custom strategy
+########################################################################################################################
+
+UNIT_TEST = True
+ORDER_SPREAD = 15
+ORDER_STEP = 1
+ORDER_SIZE = 10
+ORDER_DEPTH = 10
+ORDER_SLIP = 1
+GRID_SIDE = OrderSide.buy
+REVERSE_SIDE = OrderSide.sell if GRID_SIDE == OrderSide.buy else OrderSide.buy
+
 
 ########################################################################################################################
 # Connection/Auth

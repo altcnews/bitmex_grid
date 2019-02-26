@@ -142,6 +142,9 @@ class ExchangeInterface:
             return []
         return self.bitmex.open_orders()
 
+    def order_by_clOrdID(self, clOrdID):
+        return self.bitmex.order_by_clOrdID(clOrdID)
+
     def get_highest_buy(self):
         buys = [o for o in self.get_orders() if o['side'] == 'Buy']
         if not len(buys):
@@ -225,7 +228,8 @@ class OrderManager:
         self.print_status()
 
         # Create orders and converge.
-        self.place_orders()
+        if not settings.UNIT_TEST:
+            self.place_orders()
 
     def print_status(self):
         """Print the current MM status."""
@@ -349,6 +353,9 @@ class OrderManager:
         sells_matched = 0
         existing_orders = self.exchange.get_orders()
 
+        # print('existing_orders: ', existing_orders)
+        # print(buy_orders, sell_orders)
+
         # Check all existing orders and match them up with what we want to place.
         # If there's an open one, we might be able to amend it to fit what we want.
         for order in existing_orders:
@@ -379,6 +386,7 @@ class OrderManager:
             to_create.append(sell_orders[sells_matched])
             sells_matched += 1
 
+
         if len(to_amend) > 0:
             for amended_order in reversed(to_amend):
                 reference_order = [o for o in existing_orders if o['orderID'] == amended_order['orderID']][0]
@@ -404,6 +412,8 @@ class OrderManager:
                     logger.error("Unknown error on amend: %s. Exiting" % errorObj)
                     sys.exit(1)
 
+        # print(to_create, to_cancel)
+
         if len(to_create) > 0:
             logger.info("Creating %d orders:" % (len(to_create)))
             for order in reversed(to_create):
@@ -416,6 +426,7 @@ class OrderManager:
             for order in reversed(to_cancel):
                 logger.info("%4s %d @ %.*f" % (order['side'], order['leavesQty'], tickLog, order['price']))
             self.exchange.cancel_bulk_orders(to_cancel)
+
 
     ###
     # Position Limits
@@ -511,7 +522,7 @@ class OrderManager:
                 self.restart()
 
             self.sanity_check()  # Ensures health of mm - several cut-out points here
-            self.print_status()  # Print skew, delta, etc
+            # self.print_status()  # Print skew, delta, etc
             self.place_orders()  # Creates desired orders and converges to existing orders
 
     def restart(self):

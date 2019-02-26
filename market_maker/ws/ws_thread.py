@@ -116,6 +116,11 @@ class BitMEXWebsocket():
         # Filter to only open orders (leavesQty > 0) and those that we actually placed
         return [o for o in orders if str(o['clOrdID']).startswith(clOrdIDPrefix) and o['leavesQty'] > 0]
 
+    def order_by_clOrdID(self, clOrdID):
+        orders = self.data['order']
+        # Filter to only open orders (leavesQty > 0) and those that we actually placed
+        return [o for o in orders if str(o['clOrdID']) == clOrdID]
+
     def position(self, symbol):
         positions = self.data['position']
         pos = [p for p in positions if p['symbol'] == symbol]
@@ -206,6 +211,7 @@ class BitMEXWebsocket():
         self.ws.send(json.dumps({"op": command, "args": args or []}))
 
     def __on_message(self, ws, message):
+    # def __on_message(self, message):
         '''Handler for parsing WS messages.'''
         message = json.loads(message)
         self.logger.debug(json.dumps(message))

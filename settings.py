@@ -8,7 +8,7 @@ from market_maker.states import *
 ########################################################################################################################
 
 UNIT_TEST = True
-ORDER_SPREAD = 15
+ORDER_SPREAD = 1
 ORDER_STEP = 1
 ORDER_SIZE = 10
 ORDER_DEPTH = 10
@@ -71,7 +71,7 @@ MAINTAIN_SPREADS = True
 # it will be resubmitted.
 #
 # 0.01 == 1%
-RELIST_INTERVAL = 0.01
+RELIST_INTERVAL = 0.001
 
 
 ########################################################################################################################

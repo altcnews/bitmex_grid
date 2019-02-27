@@ -353,11 +353,6 @@ class OrderManager:
         sells_matched = 0
         existing_orders = self.exchange.get_orders()
 
-        # print('existing_orders: ', existing_orders)
-        # print(buy_orders, sell_orders)
-
-        # Check all existing orders and match them up with what we want to place.
-        # If there's an open one, we might be able to amend it to fit what we want.
         for order in existing_orders:
             try:
                 if order['side'] == 'Buy':
@@ -386,7 +381,6 @@ class OrderManager:
             to_create.append(sell_orders[sells_matched])
             sells_matched += 1
 
-
         if len(to_amend) > 0:
             for amended_order in reversed(to_amend):
                 reference_order = [o for o in existing_orders if o['orderID'] == amended_order['orderID']][0]
@@ -411,8 +405,6 @@ class OrderManager:
                 else:
                     logger.error("Unknown error on amend: %s. Exiting" % errorObj)
                     sys.exit(1)
-
-        # print(to_create, to_cancel)
 
         if len(to_create) > 0:
             logger.info("Creating %d orders:" % (len(to_create)))

@@ -141,6 +141,9 @@ class TestScarlettSubprocess(unittest.TestCase):
         order_manager.place_orders()
         order_manager.place_orders()
 
+        print(reference_buy_orders_price)
+        print(buy_orders_price)
+
         assert reference_buy_orders_price == buy_orders_price
         assert reference_sell_orders_price == sell_orders_price
 

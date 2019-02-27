@@ -23,9 +23,10 @@ class CustomOrderManager(OrderManager):
 
     def order_is_filled(self, order):
         cl_ord_id = order.get('clOrdID', False)
-        if cl_ord_id and len(self.exchange.order_by_clOrdID(cl_ord_id)) > 0:
-            _order = self.exchange.order_by_clOrdID(cl_ord_id)[0]
-            return _order.get('ordStatus') == OrderStates.filled
+        execution = self.exchange.order_by_clOrdID(cl_ord_id)
+        if cl_ord_id and len(execution) > 0:
+        #     _order = execution[-1]
+            return execution[-1].get('ordStatus') == OrderStates.filled
         else:
             return False
 
@@ -115,6 +116,7 @@ class CustomOrderManager(OrderManager):
         if self.orders[settings.GRID_SIDE] == []:
             self.add_order(settings.GRID_SIDE)
 
+
     """A sample order manager for implementing your own custom strategy"""
 
     def place_orders(self):
@@ -148,13 +150,13 @@ class CustomOrderManager(OrderManager):
             for order in reversed(self.orders[settings.REVERSE_SIDE]):
                 logger.info(
                     f"{order['side']}, {order['orderQty']} @ {order['price']}, "
-                    f"Status: {order.get('ordStatus', 'noStatus')}")
+                    f"Status: {order.get('ordStatus', 'noStatus')}, clOrdID: {order['clOrdID']}")
 
         if len(self.orders[settings.GRID_SIDE]) > 0:
             for order in reversed(self.orders[settings.GRID_SIDE]):
                 logger.info(
                     f"{order['side']}, {order['orderQty']} @ {order['price']}, "
-                    f"Status: {order.get('ordStatus', 'noStatus')}")
+                    f"Status: {order.get('ordStatus', 'noStatus')}, clOrdID: {order['clOrdID']}")
 
     def converge_orders(self, buy_orders, sell_orders):
         """Converge the orders we currently have in the book with what we want to be in the book.

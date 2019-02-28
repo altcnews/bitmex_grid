@@ -152,7 +152,7 @@ class CustomOrderManager(OrderManager):
             for order in reversed(self.orders[settings.REVERSE_SIDE]):
                 logger.info(
                     f"{order['side']}, {order['orderQty']} @ {order['price']}, "
-                    f"Status: {order.get('ordStatus', 'noStatus')}, clOrdID: {order['clOrdID']}")
+                    f"Status: {order.get('ordStatus', 'noStatus')}, clOrdID: {order.get('clOrdID')}")
 
         if len(self.orders[settings.GRID_SIDE]) > 0:
             for order in reversed(self.orders[settings.GRID_SIDE]):

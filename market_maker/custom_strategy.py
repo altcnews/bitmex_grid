@@ -158,7 +158,7 @@ class CustomOrderManager(OrderManager):
             for order in reversed(self.orders[settings.GRID_SIDE]):
                 logger.info(
                     f"{order['side']}, {order['orderQty']} @ {order['price']}, "
-                    f"Status: {order.get('ordStatus', 'noStatus')}, clOrdID: {order['clOrdID']}")
+                    f"Status: {order.get('ordStatus', 'noStatus')}, clOrdID: {order.get('clOrdID')}")
 
     def converge_orders(self, buy_orders, sell_orders):
         """Converge the orders we currently have in the book with what we want to be in the book.

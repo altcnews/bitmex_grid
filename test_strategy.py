@@ -87,7 +87,69 @@ class TestScarlettSubprocess(unittest.TestCase):
     #     assert reference_sell_orders_price == sell_orders_price
 
 
-    def test_fill_reverse(self):
+    # def test_fill_reverse(self):
+    #     order_manager = CustomOrderManager()
+    #
+    #     # Start Positions
+    #     mock_exchange = MockExchangeInterface()
+    #
+    #     last = 4000
+    #     mock_exchange.set_ticker('last', last)
+    #     order_manager.place_orders()
+    #
+    #     reference_buy_orders_price = [last - settings.ORDER_STEP]
+    #     reference_sell_orders_price = []
+    #
+    #     filled_depht = 2
+    #     reference_sell_orders_price = []
+    #     for _ in range(filled_depht):
+    #         exchange_orders = order_manager.exchange.get_orders()
+    #         buy_exchange_orders = \
+    #             list(filter(lambda o: o['side'] == OrderSide.buy, exchange_orders))
+    #
+    #         order_id = buy_exchange_orders[-1].get('clOrdID')
+    #         order_price = buy_exchange_orders[-1].get('price')
+    #         mock_exchange.change_order_status(order_id)
+    #
+    #         order_manager.place_orders()
+    #         mock_exchange.remove_filled_orders()
+    #
+    #         reference_buy_orders_price = [order_price - settings.ORDER_STEP]
+    #         reference_sell_orders_price.append(order_price + settings.ORDER_SPREAD)
+    #
+    #     reverse_depht = 1
+    #     for _ in range(reverse_depht):
+    #         exchange_orders = order_manager.exchange.get_orders()
+    #         sell_exchange_orders = \
+    #             list(filter(lambda o: o['side'] == OrderSide.sell, exchange_orders))
+    #
+    #         order_id = sell_exchange_orders[-1].get('clOrdID')
+    #         order_price = sell_exchange_orders[-1].get('price')
+    #         mock_exchange.change_order_status(order_id)
+    #
+    #         order_manager.place_orders()
+    #         mock_exchange.remove_filled_orders()
+    #
+    #         reference_buy_orders_price = [order_price - settings.ORDER_SPREAD]
+    #         reference_sell_orders_price.pop()
+    #
+    #     buy_orders = order_manager.orders[OrderSide.buy]
+    #     sell_orders = order_manager.orders[OrderSide.sell]
+    #     buy_orders_price = [o['price'] for o in buy_orders]
+    #     sell_orders_price = [o['price'] for o in sell_orders]
+    #
+    #     order_manager.place_orders()
+    #     order_manager.place_orders()
+    #
+    #     print(reference_buy_orders_price)
+    #     print(buy_orders_price)
+    #
+    #     assert reference_buy_orders_price == buy_orders_price
+    #     assert reference_sell_orders_price == sell_orders_price
+
+
+
+    def test_last_price_over_order_price(self):
         order_manager = CustomOrderManager()
 
         # Start Positions
@@ -95,57 +157,18 @@ class TestScarlettSubprocess(unittest.TestCase):
 
         last = 4000
         mock_exchange.set_ticker('last', last)
+        mock_exchange.set_position('avgEntryPrice', 3818.1055)
+        mock_exchange.set_position('currentQty', 10)
         order_manager.place_orders()
-
-        reference_buy_orders_price = [last - settings.ORDER_STEP]
-        reference_sell_orders_price = []
-
-        filled_depht = 2
-        reference_sell_orders_price = []
-        for _ in range(filled_depht):
-            exchange_orders = order_manager.exchange.get_orders()
-            buy_exchange_orders = \
-                list(filter(lambda o: o['side'] == OrderSide.buy, exchange_orders))
-
-            order_id = buy_exchange_orders[-1].get('clOrdID')
-            order_price = buy_exchange_orders[-1].get('price')
-            mock_exchange.change_order_status(order_id)
-
-            order_manager.place_orders()
-            mock_exchange.remove_filled_orders()
-
-            reference_buy_orders_price = [order_price - settings.ORDER_STEP]
-            reference_sell_orders_price.append(order_price + settings.ORDER_SPREAD)
-
-        reverse_depht = 1
-        for _ in range(reverse_depht):
-            exchange_orders = order_manager.exchange.get_orders()
-            sell_exchange_orders = \
-                list(filter(lambda o: o['side'] == OrderSide.sell, exchange_orders))
-
-            order_id = sell_exchange_orders[-1].get('clOrdID')
-            order_price = sell_exchange_orders[-1].get('price')
-            mock_exchange.change_order_status(order_id)
-
-            order_manager.place_orders()
-            mock_exchange.remove_filled_orders()
-
-            reference_buy_orders_price = [order_price - settings.ORDER_SPREAD]
-            reference_sell_orders_price.pop()
 
         buy_orders = order_manager.orders[OrderSide.buy]
         sell_orders = order_manager.orders[OrderSide.sell]
         buy_orders_price = [o['price'] for o in buy_orders]
         sell_orders_price = [o['price'] for o in sell_orders]
 
-        order_manager.place_orders()
-        order_manager.place_orders()
-
-        print(reference_buy_orders_price)
         print(buy_orders_price)
+        print(sell_orders_price)
 
-        assert reference_buy_orders_price == buy_orders_price
-        assert reference_sell_orders_price == sell_orders_price
 
 
 

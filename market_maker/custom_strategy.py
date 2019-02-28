@@ -25,7 +25,6 @@ class CustomOrderManager(OrderManager):
         cl_ord_id = order.get('clOrdID', False)
         execution = self.exchange.order_by_clOrdID(cl_ord_id)
         if cl_ord_id and len(execution) > 0:
-        #     _order = execution[-1]
             return execution[-1].get('ordStatus') == OrderStates.filled
         else:
             return False
@@ -37,9 +36,9 @@ class CustomOrderManager(OrderManager):
         ratio = -1 if side == OrderSide.buy else 1
         if price is None:
             price = self.get_last_price()
-        return price + settings.ORDER_STEP * ratio \
+        return min(price, self.get_last_price()) + settings.ORDER_STEP * ratio \
             if side == OrderSide.buy \
-            else price + settings.ORDER_SPREAD * ratio
+            else max(price, self.get_last_price()) + settings.ORDER_SPREAD * ratio
 
     def add_order(self, side, price=None):
         order = {"price": self.get_price(side, price),
@@ -76,7 +75,10 @@ class CustomOrderManager(OrderManager):
         if len(self.orders[settings.REVERSE_SIDE]) > 0:
             order = self.orders[settings.REVERSE_SIDE].pop()
             if self.order_is_filled(order):
-                self.orders = self.history_orders.pop()
+                if len(self.history_orders) > 0:
+                    self.orders = self.history_orders.pop()
+                else:
+                    self.orders = {OrderSide.sell: [], OrderSide.buy: []}
             else:
                 self.orders[settings.REVERSE_SIDE].append(order)
 
@@ -107,7 +109,7 @@ class CustomOrderManager(OrderManager):
                                            order['side'] == settings.GRID_SIDE]
         current_qty = self.exchange.get_position()['currentQty']
         if current_qty != 0:
-            while current_qty / settings.ORDER_SIZE != len(
+            while current_qty / settings.ORDER_SIZE > len(
                     self.orders[settings.REVERSE_SIDE]):
                 position_price = int(
                     self.exchange.get_position()['avgEntryPrice'])

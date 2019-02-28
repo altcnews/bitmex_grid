@@ -1,1 +1,1 @@
-python test_strategy.py
+worker python3 test_strategy.py

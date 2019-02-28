@@ -111,9 +111,12 @@ class CustomOrderManager(OrderManager):
         if current_qty != 0:
             while current_qty / settings.ORDER_SIZE > len(
                     self.orders[settings.REVERSE_SIDE]):
-                position_price = int(
-                    self.exchange.get_position()['avgEntryPrice'])
-                self.add_order(settings.REVERSE_SIDE, position_price)
+                if len(settings.REVERSE_SIDE) > 0:
+                    price = settings.REVERSE_SIDE[-1].get('price')
+                else:
+                    price = int(self.exchange.get_position()['avgEntryPrice'])
+
+                self.add_order(settings.REVERSE_SIDE, price)
 
         if self.orders[settings.GRID_SIDE] == []:
             self.add_order(settings.GRID_SIDE)

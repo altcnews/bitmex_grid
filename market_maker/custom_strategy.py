@@ -43,7 +43,9 @@ class CustomOrderManager(OrderManager):
             else max(price, self.get_last_price()) + settings.ORDER_SPREAD * ratio
 
     def change_order(self, side, price=None):
-        order = {"price": price, "orderQty": settings.ORDER_SIZE, "side": side}
+        # order = {"price": price, "orderQty": settings.ORDER_SIZE, "side": side}
+        order = {"price": self.get_price(side, price),
+                 "orderQty": settings.ORDER_SIZE, "side": side}
         self.orders[side] = [order]
 
     def add_order(self, side, price=None):
@@ -132,7 +134,9 @@ class CustomOrderManager(OrderManager):
         if current_qty != 0:
             # TODO проверка на кратность позиции
             reverse_orders_count = current_qty // settings.ORDER_SIZE
-            reverse_prices = [self.get_last_price()]
+            # reverse_prices = [self.get_last_price()]
+            reverse_prices = [self.get_price(settings.REVERSE_SIDE, self.exchange.get_position()['avgEntryPrice'])]
+
             ratio = 1 if settings.REVERSE_SIDE == OrderSide.sell else -1
 
             for i in range(1, reverse_orders_count):
@@ -143,11 +147,12 @@ class CustomOrderManager(OrderManager):
                 history_orders = self.orders_to_history()
                 self.history_orders.append(history_orders)
                 self.change_order(settings.GRID_SIDE, price - settings.ORDER_STEP * ratio)
-                self.add_order(settings.REVERSE_SIDE, price)
+                self.add_order(settings.REVERSE_SIDE, price - settings.ORDER_STEP * ratio)
+                # history_orders = self.orders_to_history()
+                # self.history_orders.append(history_orders)
 
         if self.orders[settings.GRID_SIDE] == []:
             self.add_order(settings.GRID_SIDE)
-
 
     """A sample order manager for implementing your own custom strategy"""
 
@@ -166,31 +171,6 @@ class CustomOrderManager(OrderManager):
         # self.fill_cl_ord_id()
         # self.print_active_order()
         self.print_current_log()
-
-    def print_active_order(self):
-        logger.info('Last price: {}.'.format(
-            self.exchange.get_ticker()['last']
-        ))
-        logger.info('Current Price: {}. Current Qty: {}.'.format(
-            self.exchange.get_position()['avgEntryPrice'],
-            self.exchange.get_position()['currentQty']
-        ))
-
-        logger.info("Active %d orders:" %
-                    (len(self.orders[settings.REVERSE_SIDE]) +
-                     len(self.orders[settings.GRID_SIDE])))
-
-        if len(self.orders[settings.REVERSE_SIDE]) > 0:
-            for order in reversed(self.orders[settings.REVERSE_SIDE]):
-                logger.info(
-                    f"{order['side']}, {order['orderQty']} @ {order['price']}, "
-                    f"Status: {order.get('ordStatus', 'noStatus')}, clOrdID: {order.get('clOrdID')}")
-
-        if len(self.orders[settings.GRID_SIDE]) > 0:
-            for order in reversed(self.orders[settings.GRID_SIDE]):
-                logger.info(
-                    f"{order['side']}, {order['orderQty']} @ {order['price']}, "
-                    f"Status: {order.get('ordStatus', 'noStatus')}, clOrdID: {order.get('clOrdID')}")
 
     def print_current_log(self):
         self.log_message = []
@@ -228,7 +208,6 @@ class CustomOrderManager(OrderManager):
             self.history_log_message = self.log_message
             for i in self.log_message:
                 logger.info(i)
-
 
 
     def converge_orders(self, buy_orders, sell_orders):

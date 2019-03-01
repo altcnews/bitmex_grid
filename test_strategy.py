@@ -149,15 +149,108 @@ class TestScarlettSubprocess(unittest.TestCase):
 
 
 
+    # def test_last_price_over_order_price(self):
+    #     order_manager = CustomOrderManager()
+    #
+    #     # Start Positions
+    #     mock_exchange = MockExchangeInterface()
+    #
+    #     last = 3800
+    #     mock_exchange.set_ticker('last', last)
+    #     mock_exchange.set_position('avgEntryPrice', 3818.1055)
+    #     mock_exchange.set_position('currentQty', 30)
+    #     order_manager.place_orders()
+    #
+    #     buy_orders = order_manager.orders[OrderSide.buy]
+    #     sell_orders = order_manager.orders[OrderSide.sell]
+    #     buy_orders_price = [o['price'] for o in buy_orders]
+    #     sell_orders_price = [o['price'] for o in sell_orders]
+    #     #
+    #     # print(buy_orders_price)
+    #     # print(sell_orders_price)
+    #
+    #     assert buy_orders_price == [3799]
+    #     assert sell_orders_price ==[3821, 3820, 3819]
+    #
+    #     #---------------------
+    #     exchange_orders = order_manager.exchange.get_orders()
+    #     sell_exchange_orders = \
+    #         list(filter(lambda o: o['side'] == OrderSide.sell, exchange_orders))
+    #
+    #     order_id = sell_exchange_orders[-1].get('clOrdID')
+    #     mock_exchange.change_order_status(order_id)
+    #
+    #     order_manager.place_orders()
+    #     mock_exchange.remove_filled_orders()
+    #
+    #     buy_orders = order_manager.orders[OrderSide.buy]
+    #     sell_orders = order_manager.orders[OrderSide.sell]
+    #     buy_orders_price = [o['price'] for o in buy_orders]
+    #     sell_orders_price = [o['price'] for o in sell_orders]
+    #     #
+    #     # print(buy_orders_price)
+    #     # print(sell_orders_price)
+    #
+    #     assert buy_orders_price == [3800]
+    #     assert sell_orders_price ==[3821, 3820]
+    #
+    #     # ---------------------
+    #     exchange_orders = order_manager.exchange.get_orders()
+    #     sell_exchange_orders = \
+    #         list(filter(lambda o: o['side'] == OrderSide.sell, exchange_orders))
+    #
+    #     order_id = sell_exchange_orders[-1].get('clOrdID')
+    #     mock_exchange.change_order_status(order_id)
+    #
+    #     order_manager.place_orders()
+    #     mock_exchange.remove_filled_orders()
+    #
+    #     buy_orders = order_manager.orders[OrderSide.buy]
+    #     sell_orders = order_manager.orders[OrderSide.sell]
+    #     buy_orders_price = [o['price'] for o in buy_orders]
+    #     sell_orders_price = [o['price'] for o in sell_orders]
+    #
+    #     assert buy_orders_price == [3801]
+    #     assert sell_orders_price ==[3821]
+    #
+    #     # ---------------------
+    #     exchange_orders = order_manager.exchange.get_orders()
+    #     sell_exchange_orders = \
+    #         list(filter(lambda o: o['side'] == OrderSide.sell, exchange_orders))
+    #
+    #     order_id = sell_exchange_orders[-1].get('clOrdID')
+    #     mock_exchange.change_order_status(order_id)
+    #
+    #     order_manager.place_orders()
+    #     mock_exchange.remove_filled_orders()
+    #
+    #     buy_orders = order_manager.orders[OrderSide.buy]
+    #     sell_orders = order_manager.orders[OrderSide.sell]
+    #     buy_orders_price = [o['price'] for o in buy_orders]
+    #     sell_orders_price = [o['price'] for o in sell_orders]
+    #
+    #     assert buy_orders_price == []
+    #     assert sell_orders_price==[]
+    #
+    #     # ---------------------
+    #     order_manager.place_orders()
+    #     buy_orders = order_manager.orders[OrderSide.buy]
+    #     sell_orders = order_manager.orders[OrderSide.sell]
+    #     buy_orders_price = [o['price'] for o in buy_orders]
+    #     sell_orders_price = [o['price'] for o in sell_orders]
+    #
+    #     assert buy_orders_price == [3799]
+    #     assert sell_orders_price ==[]
+
     def test_last_price_over_order_price(self):
         order_manager = CustomOrderManager()
 
         # Start Positions
         mock_exchange = MockExchangeInterface()
 
-        last = 4000
+        last = 3810
         mock_exchange.set_ticker('last', last)
-        mock_exchange.set_position('avgEntryPrice', 3818.1055)
+        mock_exchange.set_position('avgEntryPrice', 3814)
         mock_exchange.set_position('currentQty', 10)
         order_manager.place_orders()
 
@@ -169,7 +262,8 @@ class TestScarlettSubprocess(unittest.TestCase):
         print(buy_orders_price)
         print(sell_orders_price)
 
-
+        assert buy_orders_price == [3819]
+        assert sell_orders_price ==[3821]
 
 
 

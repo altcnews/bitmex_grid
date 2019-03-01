@@ -18,6 +18,9 @@ class MockExchangeInterface:
         MockExchangeInterface.orders = list(
             filter(lambda o: o['ordStatus'] != OrderStates.filled,
                    MockExchangeInterface.orders))
+        print(MockExchangeInterface.orders)
+        return MockExchangeInterface.orders
+
 
     def set_ticker(self, key, valye):
         MockExchangeInterface.ticker[key] = valye
@@ -69,15 +72,9 @@ class MockExchangeInterface:
             if order['clOrdID'] == order_id:
                 order['ordStatus'] = OrderStates.filled
                 ratio = -1 if order['side'] == OrderSide.sell else 1
-                MockExchangeInterface.position['avgEntryPrice'] = \
-                    (MockExchangeInterface.position['avgEntryPrice']
-                     * MockExchangeInterface.position['currentQty']
-                     + order['price']) / \
-                    (MockExchangeInterface.position['currentQty']
-                     + settings.ORDER_SIZE * ratio)
+                MockExchangeInterface.position['avgEntryPrice'] = 111
 
                 MockExchangeInterface.position['currentQty'] += settings.ORDER_SIZE * ratio
-
 
                 logger.info('{} {} @ {} - {} - change status to {}'.format(
                     order['side'],
@@ -91,15 +88,6 @@ class MockExchangeInterface:
 
 class MockCustomOrderManager:
     def place_orders(self):
-        logger.info("-----")
-        logger.info('Last price: {}.'.format(
-            self.exchange.get_ticker()['last']
-        ))
-        logger.info('Current Price: {}. Current Qty: {}.'.format(
-            self.exchange.get_position()['avgEntryPrice'],
-            self.exchange.get_position()['currentQty']
-        ))
-
         if len(self.orders[settings.GRID_SIDE]) == 0 \
                 and len(self.orders[settings.REVERSE_SIDE]) == 0:
             self.prepare_orders()
@@ -111,9 +99,12 @@ class MockCustomOrderManager:
         sell_orders = self.orders[OrderSide.sell]
 
         self.converge_orders(buy_orders, sell_orders)
+
+        self.fill_cl_ord_id()
         self.print_active_order()
 
     def print_active_order(self):
+        logger.info("-----")
         logger.info("Active %d orders:" %
                     (len(self.orders[settings.REVERSE_SIDE]) +
                      len(self.orders[settings.GRID_SIDE])))
@@ -121,11 +112,47 @@ class MockCustomOrderManager:
         if len(self.orders[settings.REVERSE_SIDE]) > 0:
             for order in reversed(self.orders[settings.REVERSE_SIDE]):
                 logger.info(
-                    f"{order['side']}, {order['orderQty']} @ {order['price']}, "
-                    f"Status: {order.get('ordStatus', 'noStatus')}")
+                    f"{order['side']}, {order['orderQty']} @ {order['price']}, Status: {order.get('ordStatus', 'noStatus')}")
 
         if len(self.orders[settings.GRID_SIDE]) > 0:
             for order in reversed(self.orders[settings.GRID_SIDE]):
                 logger.info(
+                    f"{order['side']}, {order['orderQty']} @ {order['price']}, Status: {order.get('ordStatus', 'noStatus')}")
+
+    def print_current_log(self):
+        self.log_message = []
+
+        self.log_message.append(
+        str('Last price: {}.'.format(
+            self.exchange.get_ticker()['last']
+        )))
+        self.log_message.append(
+        str('Current Price: {}. Current Qty: {}.'.format(
+            self.exchange.get_position()['avgEntryPrice'],
+            self.exchange.get_position()['currentQty']
+        )))
+
+        self.log_message.append(
+            str("Active %d orders:" %
+                    (len(self.orders[settings.REVERSE_SIDE]) +
+                     len(self.orders[settings.GRID_SIDE]))))
+
+        if len(self.orders[settings.REVERSE_SIDE]) > 0:
+            for order in reversed(self.orders[settings.REVERSE_SIDE]):
+                self.log_message.append(
+                    str(
                     f"{order['side']}, {order['orderQty']} @ {order['price']}, "
-                    f"Status: {order.get('ordStatus', 'noStatus')}")
+                    f"Status: {order.get('ordStatus', 'noStatus')}, clOrdID: {order.get('clOrdID')}"))
+
+        if len(self.orders[settings.GRID_SIDE]) > 0:
+            for order in reversed(self.orders[settings.GRID_SIDE]):
+                self.log_message.append(
+                    str(
+                    f"{order['side']}, {order['orderQty']} @ {order['price']}, "
+                    f"Status: {order.get('ordStatus', 'noStatus')}, clOrdID: {order.get('clOrdID')}"))
+
+        if self.log_message != self.history_log_message:
+            self.history_log_message = self.log_message
+            for i in self.log_message:
+                logger.info(i)
+

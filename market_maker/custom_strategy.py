@@ -43,14 +43,7 @@ class CustomOrderManager(OrderManager):
             else max(price, self.get_last_price()) + settings.ORDER_SPREAD * ratio
 
     def change_order(self, side, price=None):
-        # ratio = -1 if side == OrderSide.buy else 1
-        # if len(self.orders[side]) > 0:
-        #     price = self.orders[side][-1]['price'] + settings.ORDER_STEP * ratio
-        #     order = {"price": price,
-        #              "orderQty": settings.ORDER_SIZE, "side": side}
-        # else:
-        order = {"price": self.get_price(side, price),
-                 "orderQty": settings.ORDER_SIZE, "side": side}
+        order = {"price": price, "orderQty": settings.ORDER_SIZE, "side": side}
         self.orders[side] = [order]
 
     def add_order(self, side, price=None):
@@ -139,22 +132,22 @@ class CustomOrderManager(OrderManager):
         if current_qty != 0:
             # TODO проверка на кратность позиции
             reverse_orders_count = current_qty // settings.ORDER_SIZE
-            # reverse_prices = [self.get_last_price()]
             reverse_prices = [self.get_price(settings.REVERSE_SIDE, self.exchange.get_position()['avgEntryPrice'] // 1)]
+            grid_prices = [self.get_price(settings.GRID_SIDE)]
 
             ratio = 1 if settings.REVERSE_SIDE == OrderSide.sell else -1
 
             for i in range(1, reverse_orders_count):
                 reverse_prices.append(reverse_prices[-1] + settings.ORDER_STEP * ratio)
+                grid_prices.append(grid_prices[-1] + settings.ORDER_STEP * ratio)
             reverse_prices.reverse()
 
             for price in reverse_prices:
                 history_orders = self.orders_to_history()
                 self.history_orders.append(history_orders)
-                self.change_order(settings.GRID_SIDE, price - settings.ORDER_STEP * ratio)
+                self.change_order(settings.GRID_SIDE, grid_prices[-1])
                 self.add_order(settings.REVERSE_SIDE, price - settings.ORDER_STEP * ratio)
-                # history_orders = self.orders_to_history()
-                # self.history_orders.append(history_orders)
+                grid_prices.pop()
 
         if self.orders[settings.GRID_SIDE] == []:
             self.add_order(settings.GRID_SIDE)

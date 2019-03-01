@@ -171,7 +171,7 @@ class BitMEXWebsocket():
         conn_timeout = 5
         while (not self.ws.sock or not self.ws.sock.connected) and conn_timeout and not self._error:
             sleep(1)
-            conn_timeout -= 1
+            # conn_timeout -= 1
 
         if not conn_timeout or self._error:
             self.logger.error("Couldn't connect to WS! Exiting.")

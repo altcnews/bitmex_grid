@@ -40,6 +40,10 @@ class CustomOrderManager(OrderManager):
             if side == OrderSide.buy \
             else max(price, self.get_last_price()) + settings.ORDER_SPREAD * ratio
 
+    def change_order(self, side, price=None):
+        order = {"price": price, "orderQty": settings.ORDER_SIZE, "side": side}
+        self.orders[side] = [order]
+
     def add_order(self, side, price=None):
         order = {"price": self.get_price(side, price),
                  "orderQty": settings.ORDER_SIZE, "side": side}
@@ -60,8 +64,9 @@ class CustomOrderManager(OrderManager):
         return history_orders
 
     def grid_update(self):
-        history_orders = self.orders_to_history()
-        self.history_orders.append(history_orders)
+        # history_orders = self.orders_to_history()
+        # self.history_orders.append(history_orders)
+        self.history_orders.append(deepcopy(self.orders))
         order = self.orders[settings.GRID_SIDE].pop()
 
         if self.order_is_filled(order):
@@ -75,10 +80,7 @@ class CustomOrderManager(OrderManager):
         if len(self.orders[settings.REVERSE_SIDE]) > 0:
             order = self.orders[settings.REVERSE_SIDE].pop()
             if self.order_is_filled(order):
-                if len(self.history_orders) > 0:
-                    self.orders = self.history_orders.pop()
-                else:
-                    self.orders = {OrderSide.sell: [], OrderSide.buy: []}
+                self.orders = self.history_orders.pop()
             else:
                 self.orders[settings.REVERSE_SIDE].append(order)
 
@@ -101,23 +103,25 @@ class CustomOrderManager(OrderManager):
     def prepare_orders(self):
         self.orders[settings.REVERSE_SIDE] = [order for order in
                                               self.exchange.get_orders()
-                                              if order[
-                                                  'side'] == settings.REVERSE_SIDE]
+                                              if order['side'] == settings.REVERSE_SIDE]
         self.orders[settings.GRID_SIDE] = [order for order in
                                            self.exchange.get_orders()
-                                           if
-                                           order['side'] == settings.GRID_SIDE]
+                                           if order['side'] == settings.GRID_SIDE]
         current_qty = self.exchange.get_position()['currentQty']
         if current_qty != 0:
-            while current_qty / settings.ORDER_SIZE > len(
-                    self.orders[settings.REVERSE_SIDE]):
-                price = int(self.exchange.get_position()['avgEntryPrice'])
+            # TODO проверка на кратность позиции
+            reverse_orders_count = current_qty // settings.ORDER_SIZE
+            reverse_prices = [self.get_last_price()]
+            ratio = 1 if settings.REVERSE_SIDE == OrderSide.sell else -1
 
-                # if len(self.orders[settings.REVERSE_SIDE]) > 0:
-                #     price = self.orders[settings.REVERSE_SIDE][-1].get('price')
-                # else:
-                #     price = int(self.exchange.get_position()['avgEntryPrice'])
+            for i in range(1, reverse_orders_count):
+                reverse_prices.append(reverse_prices[-1] + settings.ORDER_STEP * ratio)
+            reverse_prices.reverse()
 
+            for price in reverse_prices:
+                history_orders = self.orders_to_history()
+                self.history_orders.append(history_orders)
+                self.change_order(settings.GRID_SIDE, price - settings.ORDER_STEP * ratio)
                 self.add_order(settings.REVERSE_SIDE, price)
 
         if self.orders[settings.GRID_SIDE] == []:

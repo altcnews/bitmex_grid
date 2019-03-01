@@ -164,7 +164,8 @@ class CustomOrderManager(OrderManager):
 
         self.converge_orders(buy_orders, sell_orders)
         # self.fill_cl_ord_id()
-        self.print_active_order()
+        # self.print_active_order()
+        self.print_current_log()
 
     def print_active_order(self):
         logger.info('Last price: {}.'.format(
@@ -190,6 +191,45 @@ class CustomOrderManager(OrderManager):
                 logger.info(
                     f"{order['side']}, {order['orderQty']} @ {order['price']}, "
                     f"Status: {order.get('ordStatus', 'noStatus')}, clOrdID: {order.get('clOrdID')}")
+
+    def print_current_log(self):
+        self.log_message = []
+
+        self.log_message.append(
+        str('Last price: {}.'.format(
+            self.exchange.get_ticker()['last']
+        )))
+        self.log_message.append(
+        str('Current Price: {}. Current Qty: {}.'.format(
+            self.exchange.get_position()['avgEntryPrice'],
+            self.exchange.get_position()['currentQty']
+        )))
+
+        self.log_message.append(
+            str("Active %d orders:" %
+                    (len(self.orders[settings.REVERSE_SIDE]) +
+                     len(self.orders[settings.GRID_SIDE]))))
+
+        if len(self.orders[settings.REVERSE_SIDE]) > 0:
+            for order in reversed(self.orders[settings.REVERSE_SIDE]):
+                self.log_message.append(
+                    str(
+                    f"{order['side']}, {order['orderQty']} @ {order['price']}, "
+                    f"Status: {order.get('ordStatus', 'noStatus')}, clOrdID: {order.get('clOrdID')}"))
+
+        if len(self.orders[settings.GRID_SIDE]) > 0:
+            for order in reversed(self.orders[settings.GRID_SIDE]):
+                self.log_message.append(
+                    str(
+                    f"{order['side']}, {order['orderQty']} @ {order['price']}, "
+                    f"Status: {order.get('ordStatus', 'noStatus')}, clOrdID: {order.get('clOrdID')}"))
+
+        if self.log_message != self.history_log_message:
+            self.history_log_message = self.log_message
+            for i in self.log_message:
+                logger.info(i)
+
+
 
     def converge_orders(self, buy_orders, sell_orders):
         """Converge the orders we currently have in the book with what we want to be in the book.

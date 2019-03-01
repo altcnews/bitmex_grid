@@ -85,8 +85,10 @@ class CustomOrderManager(OrderManager):
     def reverse_update(self):
         if len(self.orders[settings.REVERSE_SIDE]) > 0:
             order = self.orders[settings.REVERSE_SIDE].pop()
-            print('order')
-            print(order)
+            cl_ord_id = order.get('clOrdID', False)
+            if not cl_ord_id:
+                print('order')
+                print(order)
             if self.order_is_filled(order):
                 self.orders = self.history_orders.pop()
             else:
@@ -166,7 +168,7 @@ class CustomOrderManager(OrderManager):
         sell_orders = self.orders[OrderSide.sell]
 
         self.converge_orders(buy_orders, sell_orders)
-        # self.fill_cl_ord_id()
+        self.fill_cl_ord_id()
         # self.print_active_order()
         self.print_current_log()
 

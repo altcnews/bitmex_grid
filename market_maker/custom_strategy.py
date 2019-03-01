@@ -43,7 +43,12 @@ class CustomOrderManager(OrderManager):
             else max(price, self.get_last_price()) + settings.ORDER_SPREAD * ratio
 
     def change_order(self, side, price=None):
-        # order = {"price": price, "orderQty": settings.ORDER_SIZE, "side": side}
+        # ratio = -1 if side == OrderSide.buy else 1
+        # if len(self.orders[side]) > 0:
+        #     price = self.orders[side][-1]['price'] + settings.ORDER_STEP * ratio
+        #     order = {"price": price,
+        #              "orderQty": settings.ORDER_SIZE, "side": side}
+        # else:
         order = {"price": self.get_price(side, price),
                  "orderQty": settings.ORDER_SIZE, "side": side}
         self.orders[side] = [order]
@@ -135,7 +140,7 @@ class CustomOrderManager(OrderManager):
             # TODO проверка на кратность позиции
             reverse_orders_count = current_qty // settings.ORDER_SIZE
             # reverse_prices = [self.get_last_price()]
-            reverse_prices = [self.get_price(settings.REVERSE_SIDE, self.exchange.get_position()['avgEntryPrice'])]
+            reverse_prices = [self.get_price(settings.REVERSE_SIDE, self.exchange.get_position()['avgEntryPrice'] // 1)]
 
             ratio = 1 if settings.REVERSE_SIDE == OrderSide.sell else -1
 

@@ -16,6 +16,8 @@ class CustomOrderManager(OrderManager):
 
     def __init__(self):
         self.history_orders = []
+        self.history_log_message = []
+        self.log_message = []
         self.orders = {}
         self.orders[OrderSide.sell] = []
         self.orders[OrderSide.buy] = []
@@ -76,6 +78,10 @@ class CustomOrderManager(OrderManager):
             self.orders[settings.GRID_SIDE].append(order)
             self.history_orders.pop()
 
+    def order_not_found(self, order):
+        prices_open_orders = [o['price'] for o in self.exchange.get_orders()]
+        return order['price'] not in prices_open_orders
+
     def reverse_update(self):
         if len(self.orders[settings.REVERSE_SIDE]) > 0:
             order = self.orders[settings.REVERSE_SIDE].pop()
@@ -85,6 +91,19 @@ class CustomOrderManager(OrderManager):
                 self.orders = self.history_orders.pop()
             else:
                 self.orders[settings.REVERSE_SIDE].append(order)
+
+    def fill_cl_ord_id(self):
+        cl_ord_id = {o['price']:o['clOrdID'] for o in self.exchange.get_orders()}
+
+        if not (len(cl_ord_id) ==
+            len(self.orders[settings.REVERSE_SIDE]) +
+            len(self.orders[settings.GRID_SIDE])):
+            self.restart()
+
+        for order in self.orders[settings.REVERSE_SIDE]:
+            order['clOrdID'] = cl_ord_id[order['price']]
+        for order in self.orders[settings.GRID_SIDE]:
+            order['clOrdID'] = cl_ord_id[order['price']]
 
     def print_active_order(self):
         logger.info("-----")
@@ -133,14 +152,6 @@ class CustomOrderManager(OrderManager):
     """A sample order manager for implementing your own custom strategy"""
 
     def place_orders(self):
-        logger.info('Last price: {}.'.format(
-            self.exchange.get_ticker()['last']
-        ))
-        logger.info('Current Price: {}. Current Qty: {}.'.format(
-            self.exchange.get_position()['avgEntryPrice'],
-            self.exchange.get_position()['currentQty']
-        ))
-
         if len(self.orders[settings.GRID_SIDE]) == 0 \
                 and len(self.orders[settings.REVERSE_SIDE]) == 0:
             self.prepare_orders()
@@ -152,9 +163,18 @@ class CustomOrderManager(OrderManager):
         sell_orders = self.orders[OrderSide.sell]
 
         self.converge_orders(buy_orders, sell_orders)
+        # self.fill_cl_ord_id()
         self.print_active_order()
 
     def print_active_order(self):
+        logger.info('Last price: {}.'.format(
+            self.exchange.get_ticker()['last']
+        ))
+        logger.info('Current Price: {}. Current Qty: {}.'.format(
+            self.exchange.get_position()['avgEntryPrice'],
+            self.exchange.get_position()['currentQty']
+        ))
+
         logger.info("Active %d orders:" %
                     (len(self.orders[settings.REVERSE_SIDE]) +
                      len(self.orders[settings.GRID_SIDE])))

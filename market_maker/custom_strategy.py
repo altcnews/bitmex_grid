@@ -224,7 +224,7 @@ class CustomOrderManager(OrderManager):
                     f"{order['side']}, {order['orderQty']} @ {order['price']}, "
                     f"Status: {order.get('ordStatus', 'noStatus')}, clOrdID: {order.get('clOrdID')}"))
 
-        if self.log_message != self.history_log_message:
+        if self.log_message[1:] != self.history_log_message[1:]:
             self.history_log_message = self.log_message
             for i in self.log_message:
                 logger.info(i)

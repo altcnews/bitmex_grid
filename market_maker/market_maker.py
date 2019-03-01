@@ -501,7 +501,7 @@ class OrderManager:
 
     def run_loop(self):
         while True:
-            sys.stdout.write("-----\n")
+            # sys.stdout.write("-----\n")
             sys.stdout.flush()
 
             self.check_file_change()

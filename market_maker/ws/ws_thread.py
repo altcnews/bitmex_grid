@@ -145,7 +145,7 @@ class BitMEXWebsocket():
 
     #
     # Private methods
-    #
+    # Couldn't connect to WS! Exiting.
 
     def __connect(self, wsURL):
         '''Connect to the websocket in a thread.'''

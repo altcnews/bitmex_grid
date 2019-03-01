@@ -64,9 +64,9 @@ class CustomOrderManager(OrderManager):
         return history_orders
 
     def grid_update(self):
-        # history_orders = self.orders_to_history()
-        # self.history_orders.append(history_orders)
-        self.history_orders.append(deepcopy(self.orders))
+        history_orders = self.orders_to_history()
+        self.history_orders.append(history_orders)
+        # self.history_orders.append(deepcopy(self.orders))
         order = self.orders[settings.GRID_SIDE].pop()
 
         if self.order_is_filled(order):
@@ -79,6 +79,8 @@ class CustomOrderManager(OrderManager):
     def reverse_update(self):
         if len(self.orders[settings.REVERSE_SIDE]) > 0:
             order = self.orders[settings.REVERSE_SIDE].pop()
+            print('order')
+            print(order)
             if self.order_is_filled(order):
                 self.orders = self.history_orders.pop()
             else:

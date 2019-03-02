@@ -14,10 +14,10 @@ def setup_custom_logger(name, log_level=settings.LOG_LEVEL):
     logger.setLevel(log_level)
     logger.addHandler(handler)
 
-    date = datetime.today().strftime("%Y%m%d")
-    handler = logging.FileHandler('{}.log'.format(date))
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
+    # date = datetime.today().strftime("%Y%m%d")
+    # handler = logging.FileHandler('{}.log'.format(date))
+    # handler.setFormatter(formatter)
+    # logger.addHandler(handler)
 
 
     return logger

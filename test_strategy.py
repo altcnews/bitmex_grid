@@ -248,7 +248,7 @@ class TestScarlettSubprocess(unittest.TestCase):
         # Start Positions
         mock_exchange = MockExchangeInterface()
 
-        last = 3810
+        last = 3820
         mock_exchange.set_ticker('last', last)
         mock_exchange.set_position('avgEntryPrice', 3814)
         mock_exchange.set_position('currentQty', 10)
@@ -262,8 +262,8 @@ class TestScarlettSubprocess(unittest.TestCase):
         print(buy_orders_price)
         print(sell_orders_price)
 
-        assert buy_orders_price == [3819]
-        assert sell_orders_price ==[3821]
+        assert buy_orders_price == [3805]
+        assert sell_orders_price ==[3819]
 
 
 

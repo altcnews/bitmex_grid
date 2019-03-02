@@ -38,7 +38,7 @@ class CustomOrderManager(OrderManager):
         ratio = -1 if side == OrderSide.buy else 1
         if price is None:
             price = self.get_last_price()
-        return min(price, self.get_last_price()) + settings.ORDER_STEP * ratio \
+        return min(price, self.get_last_price()) + settings.ORDER_SPREAD * ratio \
             if side == OrderSide.buy \
             else max(price, self.get_last_price()) + settings.ORDER_SPREAD * ratio
 
@@ -116,12 +116,14 @@ class CustomOrderManager(OrderManager):
         if len(self.orders[settings.REVERSE_SIDE]) > 0:
             for order in reversed(self.orders[settings.REVERSE_SIDE]):
                 logger.info(
-                    f"{order['side']}, {order['orderQty']} @ {order['price']}, Status: {order.get('ordStatus', 'noStatus')}")
+                    f"{order['side']}, {order['orderQty']} @ {order['price']},"
+                    f" Status: {order.get('ordStatus', 'noStatus')}")
 
         if len(self.orders[settings.GRID_SIDE]) > 0:
             for order in reversed(self.orders[settings.GRID_SIDE]):
                 logger.info(
-                    f"{order['side']}, {order['orderQty']} @ {order['price']}, Status: {order.get('ordStatus', 'noStatus')}")
+                    f"{order['side']}, {order['orderQty']} @ {order['price']},"
+                    f" Status: {order.get('ordStatus', 'noStatus')}")
 
     def prepare_orders(self):
         self.orders[settings.REVERSE_SIDE] = [order for order in
@@ -133,11 +135,11 @@ class CustomOrderManager(OrderManager):
         current_qty = self.exchange.get_position()['currentQty']
         if current_qty != 0:
             # TODO проверка на кратность позиции
+            ratio = 1 if settings.REVERSE_SIDE == OrderSide.sell else -1
             reverse_orders_count = current_qty // settings.ORDER_SIZE
             reverse_prices = [self.get_price(settings.REVERSE_SIDE, self.exchange.get_position()['avgEntryPrice'] // 1)]
+            reverse_prices = [reverse_prices[-1] - settings.ORDER_SPREAD * ratio]
             grid_prices = [self.get_price(settings.GRID_SIDE)]
-
-            ratio = 1 if settings.REVERSE_SIDE == OrderSide.sell else -1
 
             for i in range(1, reverse_orders_count):
                 reverse_prices.append(reverse_prices[-1] + settings.ORDER_STEP * ratio)
@@ -148,7 +150,8 @@ class CustomOrderManager(OrderManager):
                 history_orders = self.orders_to_history()
                 self.history_orders.append(history_orders)
                 self.change_order(settings.GRID_SIDE, grid_prices[-1])
-                self.add_order(settings.REVERSE_SIDE, price - settings.ORDER_STEP * ratio)
+                self.add_order(settings.REVERSE_SIDE, price)
+                # self.add_order(settings.REVERSE_SIDE, price - settings.ORDER_STEP * ratio)
                 grid_prices.pop()
 
         if self.orders[settings.GRID_SIDE] == []:

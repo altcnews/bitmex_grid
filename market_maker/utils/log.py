@@ -19,5 +19,4 @@ def setup_custom_logger(name, log_level=settings.LOG_LEVEL):
     # handler.setFormatter(formatter)
     # logger.addHandler(handler)
 
-
     return logger

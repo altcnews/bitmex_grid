@@ -262,8 +262,8 @@ class TestScarlettSubprocess(unittest.TestCase):
         print(buy_orders_price)
         print(sell_orders_price)
 
-        assert buy_orders_price == [3805]
-        assert sell_orders_price ==[3819]
+        assert buy_orders_price == [3818]
+        assert sell_orders_price ==[3822]
 
 
 

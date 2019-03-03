@@ -120,6 +120,10 @@ class BitMEXWebsocket():
         orders = self.data['execution']
         return [o for o in orders if str(o['clOrdID']) == clOrdID]
 
+    def orders_execution(self, clOrdIDPrefix):
+        orders = self.data['execution']
+        return [o for o in orders if str(o['clOrdID']).startswith(clOrdIDPrefix)]
+
     def position(self, symbol):
         positions = self.data['position']
         pos = [p for p in positions if p['symbol'] == symbol]

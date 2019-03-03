@@ -207,6 +207,19 @@ class CustomOrderManager(OrderManager):
                     f"{order['side']}, {order['orderQty']} @ {order['price']}, "
                     f"Status: {order.get('ordStatus', 'noStatus')}, clOrdID: {order.get('clOrdID')}"))
 
+        existing_orders = self.exchange.get_orders()
+        self.log_message.append(str("Existing %d orders:" % (existing_orders)))
+        if len(existing_orders) > 0:
+            for order in reversed(existing_orders):
+                self.log_message.append(str(order))
+
+        execution_orders = self.exchange.get_orders_execution()
+        self.log_message.append(str("Execution %d orders:" % (execution_orders)))
+        if len(execution_orders) > 0:
+            for order in reversed(existing_orders):
+                self.log_message.append(str(order))
+
+
         if self.log_message[1:] != self.history_log_message[1:]:
             self.history_log_message = self.log_message
             for i in self.log_message:

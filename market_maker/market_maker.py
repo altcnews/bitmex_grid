@@ -142,6 +142,9 @@ class ExchangeInterface:
             return []
         return self.bitmex.open_orders()
 
+    def get_orders_execution(self):
+        return self.bitmex.orders_execution()
+
     def order_by_clOrdID(self, clOrdID):
         return self.bitmex.order_by_clOrdID(clOrdID)
 
@@ -416,7 +419,8 @@ class OrderManager:
         if len(to_cancel) > 0:
             logger.info("Canceling %d orders:" % (len(to_cancel)))
             for order in reversed(to_cancel):
-                logger.info("%4s %d @ %.*f" % (order['side'], order['leavesQty'], tickLog, order['price']))
+                logger.info("%4s %d @ %.*f %s" % (order['side'], order['leavesQty'],
+                                                  tickLog, order['price'], order.get('clOrdID')))
             self.exchange.cancel_bulk_orders(to_cancel)
 
 

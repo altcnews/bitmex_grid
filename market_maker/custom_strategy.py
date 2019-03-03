@@ -109,21 +109,51 @@ class CustomOrderManager(OrderManager):
 
     def print_active_order(self):
         logger.info("-----")
-        logger.info("Active %d orders:" %
+
+        logger.info(('Last price: {}.'.format(
+            self.exchange.get_ticker()['last']
+        )))
+        logger.info(('Current Price: {}. Current Qty: {}.'.format(
+            self.exchange.get_position()['avgEntryPrice'],
+            self.exchange.get_position()['currentQty']
+        )))
+
+        execution_orders = self.exchange.get_orders_execution()
+        logger.info(("Execution %d orders:" % (len(execution_orders))))
+        if len(execution_orders) > 0:
+            for order in reversed(execution_orders):
+                logger.info((
+                    f"{order['side']}, {order['orderQty']} @ {order['price']}, "
+                    f"Status: {order.get('ordStatus', 'noStatus')}, clOrdID: {order.get('clOrdID')}, "
+                    f"orderID': {order.get('orderID')}"))
+
+        existing_orders = self.exchange.get_orders()
+        logger.info(("Existing %d orders:" % (len(existing_orders))))
+        if len(existing_orders) > 0:
+            for order in reversed(existing_orders):
+                logger.info((
+                    f"{order['side']}, {order['orderQty']} @ {order['price']}, "
+                    f"Status: {order.get('ordStatus', 'noStatus')}, clOrdID: {order.get('clOrdID')}, "
+                    f"orderID': {order.get('orderID')}"))
+
+        logger.info(("Active %d orders:" %
                     (len(self.orders[settings.REVERSE_SIDE]) +
-                     len(self.orders[settings.GRID_SIDE])))
+                     len(self.orders[settings.GRID_SIDE]))))
 
         if len(self.orders[settings.REVERSE_SIDE]) > 0:
             for order in reversed(self.orders[settings.REVERSE_SIDE]):
-                logger.info(
-                    f"{order['side']}, {order['orderQty']} @ {order['price']},"
-                    f" Status: {order.get('ordStatus', 'noStatus')}")
+                logger.info((
+                    f"{order['side']}, {order['orderQty']} @ {order['price']}, "
+                    f"Status: {order.get('ordStatus', 'noStatus')}, clOrdID: {order.get('clOrdID')}"))
 
         if len(self.orders[settings.GRID_SIDE]) > 0:
             for order in reversed(self.orders[settings.GRID_SIDE]):
-                logger.info(
-                    f"{order['side']}, {order['orderQty']} @ {order['price']},"
-                    f" Status: {order.get('ordStatus', 'noStatus')}")
+                logger.info((
+                    f"{order['side']}, {order['orderQty']} @ {order['price']}, "
+                    f"Status: {order.get('ordStatus', 'noStatus')}, clOrdID: {order.get('clOrdID')}"))
+
+
+
 
     def prepare_orders(self):
         self.orders[settings.REVERSE_SIDE] = [order for order in
@@ -173,7 +203,8 @@ class CustomOrderManager(OrderManager):
         self.converge_orders(buy_orders, sell_orders)
         self.fill_cl_ord_id()
         # self.print_active_order()
-        self.print_current_log()
+        # self.print_current_log()
+        self.print_active_order()
 
     def print_current_log(self):
         self.log_message = []

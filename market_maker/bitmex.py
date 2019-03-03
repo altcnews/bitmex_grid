@@ -183,6 +183,10 @@ class BitMEX(object):
         return self.ws.open_orders(self.orderIDPrefix)
 
     @authentication_required
+    def orders_execution(self):
+        return self.ws.orders_execution(self.orderIDPrefix)
+
+    @authentication_required
     def order_by_clOrdID(self, clOrdID):
         """Get open by_clOrdID."""
         return self.ws.order_by_clOrdID(clOrdID)

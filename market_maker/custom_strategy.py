@@ -211,7 +211,7 @@ class CustomOrderManager(OrderManager):
         sell_orders = self.orders[OrderSide.sell]
 
         self.converge_orders(buy_orders, sell_orders)
-        self.fill_cl_ord_id()
+        # self.fill_cl_ord_id()
         # self.print_active_order()
         # self.print_current_log()
         self.print_active_order()

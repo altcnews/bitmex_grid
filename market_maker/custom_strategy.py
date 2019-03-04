@@ -66,6 +66,8 @@ class CustomOrderManager(OrderManager):
         return history_orders
 
     def grid_update(self):
+        self.print_active_order('before grid update')
+
         history_orders = self.orders_to_history()
         self.history_orders.append(history_orders)
         # self.history_orders.append(deepcopy(self.orders))
@@ -78,11 +80,15 @@ class CustomOrderManager(OrderManager):
             self.orders[settings.GRID_SIDE].append(order)
             self.history_orders.pop()
 
+        self.print_active_order('after grid update')
+
     def order_not_found(self, order):
         prices_open_orders = [o['price'] for o in self.exchange.get_orders()]
         return order['price'] not in prices_open_orders
 
     def reverse_update(self):
+        self.print_active_order('before reverse_update')
+
         if len(self.orders[settings.REVERSE_SIDE]) > 0:
             order = self.orders[settings.REVERSE_SIDE].pop()
             cl_ord_id = order.get('clOrdID', False)
@@ -93,6 +99,8 @@ class CustomOrderManager(OrderManager):
                 self.orders = self.history_orders.pop()
             else:
                 self.orders[settings.REVERSE_SIDE].append(order)
+
+        self.print_active_order('after reverse_update')
 
     def fill_cl_ord_id(self):
         cl_ord_id = {o['price']:o['clOrdID'] for o in self.exchange.get_orders()}
@@ -107,8 +115,8 @@ class CustomOrderManager(OrderManager):
         for order in self.orders[settings.GRID_SIDE]:
             order['clOrdID'] = cl_ord_id[order['price']]
 
-    def print_active_order(self):
-        logger.info("-----")
+    def print_active_order(self, info_head="-----"):
+        logger.info(info_head)
 
         logger.info(('Last price: {}.'.format(
             self.exchange.get_ticker()['last']

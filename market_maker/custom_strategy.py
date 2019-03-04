@@ -108,7 +108,8 @@ class CustomOrderManager(OrderManager):
         if not (len(cl_ord_id) ==
             len(self.orders[settings.REVERSE_SIDE]) +
             len(self.orders[settings.GRID_SIDE])):
-            self.restart()
+            self.print_active_order('fill_cl_ord_id')
+            # self.restart()
 
         for order in self.orders[settings.REVERSE_SIDE]:
             order['clOrdID'] = cl_ord_id[order['price']]

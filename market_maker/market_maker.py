@@ -485,7 +485,7 @@ class OrderManager:
         """Restart if any files we're watching have changed."""
         for f, mtime in watched_files_mtimes:
             if getmtime(f) > mtime:
-                self.restart()
+                self.restart('file changed')
 
     def check_connection(self):
         """Ensure the WS connections are still open."""
@@ -515,14 +515,14 @@ class OrderManager:
             # the MM will crash entirely as it is unable to connect to the WS on boot.
             if not self.check_connection():
                 logger.error("Realtime data connection unexpectedly closed, restarting.")
-                self.restart()
+                self.restart('not self.check_connection')
 
             self.sanity_check()  # Ensures health of mm - several cut-out points here
             # self.print_status()  # Print skew, delta, etc
             self.place_orders()  # Creates desired orders and converges to existing orders
 
-    def restart(self):
-        logger.info("Restarting the market maker...")
+    def restart(self, reason=None):
+        logger.info("Restarting the market maker... Because of {}".format(reason))
         os.execv(sys.executable, [sys.executable] + sys.argv)
 
 #

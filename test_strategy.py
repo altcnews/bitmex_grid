@@ -251,7 +251,7 @@ class TestScarlettSubprocess(unittest.TestCase):
         last = 3820
         mock_exchange.set_ticker('last', last)
         mock_exchange.set_position('avgEntryPrice', 3814)
-        mock_exchange.set_position('currentQty', 10)
+        mock_exchange.set_position('currentQty', 1)
         order_manager.place_orders()
 
         buy_orders = order_manager.orders[OrderSide.buy]

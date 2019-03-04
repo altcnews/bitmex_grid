@@ -116,6 +116,7 @@ class CustomOrderManager(OrderManager):
             order['clOrdID'] = cl_ord_id[order['price']]
 
     def print_active_order(self, info_head="-----"):
+        logger.info("-----")
         logger.info(info_head)
 
         logger.info(('Last price: {}.'.format(

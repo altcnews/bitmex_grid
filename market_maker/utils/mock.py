@@ -103,8 +103,8 @@ class MockCustomOrderManager:
         self.fill_cl_ord_id()
         self.print_active_order()
 
-    def print_active_order(self):
-        logger.info("-----")
+    def print_active_order(self, info_head="-----"):
+        logger.info(info_head)
         logger.info("Active %d orders:" %
                     (len(self.orders[settings.REVERSE_SIDE]) +
                      len(self.orders[settings.GRID_SIDE])))
